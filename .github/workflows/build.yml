@@ -26,7 +26,10 @@ jobs:
           gradle-version: '8.2'
 
       - name: Generate Gradle Wrapper
-        run: gradle wrapper
+        # retried: GitHub's download and cache services sometimes have short outages
+        run: |
+          for i in 1 2 3; do gradle wrapper --stacktrace && exit 0; echo "retry $i"; sleep 30; done
+          exit 1
 
       - name: Build APK
         run: |

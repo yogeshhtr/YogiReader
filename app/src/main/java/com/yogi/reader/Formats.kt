@@ -227,13 +227,14 @@ object Formats {
                     val t = StringBuilder()
                     var n = r.firstChild
                     while (n != null) {
-                        if (n is Element) when (n.tagName) {
-                            "w:t" -> t.append(esc(n.textContent))
+                        val el = n
+                        if (el is Element) when (el.tagName) {
+                            "w:t" -> t.append(esc(el.textContent))
                             "w:tab" -> t.append("&emsp;")
                             "w:br" -> t.append("<br>")
-                            "w:drawing", "w:pict" -> n.all("a:blip").forEach { bl -> t.append(image(bl.getAttribute("r:embed"))) }
+                            "w:drawing", "w:pict" -> el.all("a:blip").forEach { bl -> t.append(image(bl.getAttribute("r:embed"))) }
                         }
-                        n = n.nextSibling
+                        n = el.nextSibling
                     }
                     var s = t.toString()
                     if (b) s = "<b>$s</b>"
@@ -263,11 +264,12 @@ object Formats {
             val body = doc.documentElement.all("w:body").firstOrNull() ?: throw Unsupported("Empty Word file")
             var n = body.firstChild
             while (n != null) {
-                if (n is Element) when (n.tagName) {
-                    "w:p" -> sb.append(para(n))
+                val el = n
+                if (el is Element) when (el.tagName) {
+                    "w:p" -> sb.append(para(el))
                     "w:tbl" -> {
                         sb.append("<div class=\"yr-scroll\"><table>")
-                        for (tr in n.kids("w:tr")) {
+                        for (tr in el.kids("w:tr")) {
                             sb.append("<tr>")
                             for (tc in tr.kids("w:tc")) sb.append("<td>" + tc.kids("w:p").joinToString("") { runs(it) + "<br>" } + "</td>")
                             sb.append("</tr>")
@@ -275,7 +277,7 @@ object Formats {
                         sb.append("</table></div>")
                     }
                 }
-                n = n.nextSibling
+                n = el.nextSibling
             }
         }
         return single(dir, file.nameWithoutExtension, sb.toString(), toc)

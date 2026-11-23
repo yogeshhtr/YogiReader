@@ -525,7 +525,7 @@ class ReaderActivity : AppCompatActivity() {
                 web.evaluateJavascript("YR.search(${JSONObject.quote(q)})", null)
             } else {
                 web.findAllAsync(q)
-                web.setFindListener { _, active, count, done ->
+                web.setFindListener { active, count, done ->
                     if (done) info.text = if (count == 0) "No matches for “$q”" else "Match ${active + 1} of $count · tap 🔍 again for the next"
                 }
                 toast("Tap 🔍 then OK again to find the next one")
